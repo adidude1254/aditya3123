@@ -15,6 +15,9 @@ jobs:
 
       - name: Build Docker Image
         run: docker build -t static-website .
+       
+      - name: Save Docker Image
+        run: docker save static-website -o static-website.tar 
 
       - name: upload files to EC2
         uses: appleboy/scp-action@master
@@ -22,10 +25,11 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: "docker-compose.yml"
+          source: |
+            docker-compose.yml
+            static-website.tar
           target: "~/static-website"
-          port: 22
-          debug: true
+        
 
       - name: Run docker on EC2
         uses: appleboy/ssh-action@master
@@ -35,7 +39,6 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             cd ~/static-website
+            docker load < static-website.tar
             docker-compose down
-            docker-compose up -d
-          port: 22
-          debug: true  
+            docker-compose up -d 
