@@ -22,16 +22,20 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          source: docker-compose.yml
-          target: "~/static-website"
-        
-      - name: Run docker on EC2
+          source: "./"
+          target: "/home/ubuntu/static-website"
+          strip_components: 0
+
+      - name: Deploy using Docker-Compose
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.EC2_HOST }}
           username:  ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd ~/static-website
+            echo "Current directory: $(pwd)"
+            echo "Contents of static-website:"
+            ls -lah /home/ubuntu/static-website
+            cd /home/ubuntu/static-website
             docker-compose down
             docker-compose up --build -d 
