@@ -6,6 +6,4 @@ services:
       dockerfile: Dockerfile
     ports:
       - "80:80"
-    networks: 
-      - default
     restart: always
